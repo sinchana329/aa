@@ -1,0 +1,68 @@
+#include <stdio.h>
+
+#define MAX 10
+
+typedef struct {
+    int pid, at, bt, rt, wt, tat, priority;
+} Process;
+
+void priority_preemptive(Process p[], int n) {
+    int time = 0, completed = 0, highest_priority, min_priority = 9999;
+
+    while (completed < n) {
+        highest_priority = -1;
+        min_priority = 9999;
+
+        // Find the process with the highest priority (lowest priority number)
+        for (int i = 0; i < n; i++) {
+            if (p[i].at <= time && p[i].rt > 0 && p[i].priority < min_priority) {
+                min_priority = p[i].priority;
+                highest_priority = i;
+            }
+        }
+
+        // If no process is ready, just increment time
+        if (highest_priority == -1) {
+            time++;
+            continue;
+        }
+
+        // Decrease remaining burst time
+        p[highest_priority].rt--;
+
+        // If process is completed
+        if (p[highest_priority].rt == 0) {
+            p[highest_priority].tat = time + 1 - p[highest_priority].at;
+            p[highest_priority].wt = p[highest_priority].tat - p[highest_priority].bt;
+            completed++;
+        }
+
+        // Increment time
+        time++;
+    }
+}
+
+int main() {
+    Process p[MAX];
+    int n;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        p[i].pid = i + 1;
+        printf("Enter arrival time, burst time, and priority for process %d: ", p[i].pid);
+        scanf("%d %d %d", &p[i].at, &p[i].bt, &p[i].priority);
+        p[i].rt = p[i].bt;  // Initialize remaining burst time
+    }
+
+    priority_preemptive(p, n);
+
+    // Display the results
+    printf("\nPID\tAT\tBT\tPriority\tWT\tTAT\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t\t%d\t%d\n", p[i].pid, p[i].at, p[i].bt, p[i].priority, p[i].wt, p[i].tat);
+    }
+
+    return 0;
+}

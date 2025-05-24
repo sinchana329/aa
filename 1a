@@ -1,0 +1,32 @@
+// Write a program in C to find the sum of the left diagonals of a matrix.
+#include <stdio.h>
+
+int main() {
+    int i, j;
+    int n;
+
+    // Input matrix size (n x n)
+    printf("Enter the size of the matrix (n x n): ");
+    scanf("%d", &n);
+
+    int matrix[n][n]; // Declare a square matrix
+
+    // Input the elements of the matrix
+    printf("Enter the elements of the matrix:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            scanf("%d", &matrix[i][j]);
+        }
+    }
+
+    // Calculate the sum of the left diagonal (primary diagonal)
+    int diagonalSum = 0;
+    for (i = 0; i < n; i++) {
+        diagonalSum += matrix[i][i]; // Left diagonal elements are matrix[i][i]
+    }
+
+    // Output the result
+    printf("The sum of the left diagonal is: %d\n", diagonalSum);
+
+    return 0;
+}

@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Process {
+    int id;
+    int arrival_time;
+    int burst_time;
+    int completion_time;
+    int waiting_time;
+    int turnaround_time;
+};
+
+void calculateCompletionTime(struct Process *p, int n) {
+    int time = 0;
+    int completed = 0;
+    int min_burst_time = 10000;
+    int shortest = 0;
+    int check = 0;
+    
+    while (completed != n) {
+        for (int i = 0; i < n; i++) {
+            if (p[i].arrival_time <= time && p[i].burst_time < min_burst_time && p[i].burst_time > 0) {
+                min_burst_time = p[i].burst_time;
+                shortest = i;
+                check = 1;
+            }
+        }
+
+        if (check == 0) {
+            time++;
+            continue;
+        }
+
+        p[shortest].burst_time = 0;
+        p[shortest].completion_time = time + min_burst_time;
+        p[shortest].turnaround_time = p[shortest].completion_time - p[shortest].arrival_time;
+        p[shortest].waiting_time = p[shortest].turnaround_time - min_burst_time;
+        
+        time += min_burst_time;
+        min_burst_time = 10000;
+        completed++;
+        check = 0;
+    }
+}
+
+void findAverageTime(struct Process *p, int n) {
+    int total_waiting_time = 0;
+    int total_turnaround_time = 0;
+
+    calculateCompletionTime(p, n);
+
+    printf("Process ID | Arrival Time | Burst Time | Completion Time | Waiting Time | Turnaround Time\n");
+    for (int i = 0; i < n; i++) {
+        total_waiting_time += p[i].waiting_time;
+        total_turnaround_time += p[i].turnaround_time;
+        printf("P%d         | %d           | %d          | %d               | %d           | %d\n",
+            p[i].id, p[i].arrival_time, p[i].burst_time, p[i].completion_time, p[i].waiting_time, p[i].turnaround_time);
+    }
+
+    printf("\nAverage Waiting Time = %.2f\n", (float)total_waiting_time / n);
+    printf("Average Turnaround Time = %.2f\n", (float)total_turnaround_time / n);
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process *p = (struct Process *)malloc(n * sizeof(struct Process));
+
+    // Input the details for each process
+    for (int i = 0; i < n; i++) {
+        p[i].id = i + 1;
+        printf("\nEnter details for Process P%d:\n", i + 1);
+        printf("Arrival Time: ");
+        scanf("%d", &p[i].arrival_time);
+        printf("Burst Time: ");
+        scanf("%d", &p[i].burst_time);
+    }
+
+    findAverageTime(p, n);
+
+    free(p);  // Deallocating memory
+    return 0;
+}
